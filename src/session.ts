@@ -46,7 +46,8 @@ export const SESSION_INFO = async (
 export const SESSION_START = async (
   HOST: string,
   API_KEY: string,
-  connector_id: string
+  connector_id: string,
+  stop_kw?: number
 ): Promise<{ success: boolean; message: string; data?: any }> => {
   try {
     const res = await axiosMasterLogger(
@@ -57,7 +58,7 @@ export const SESSION_START = async (
           "x-api-key": API_KEY,
           "Content-Type": "application/json"
         },
-        data: { connector_id }
+        data: { connector_id, stop_kw }
       },
       { name: "SESSION START", timeout: 20000 }
     );

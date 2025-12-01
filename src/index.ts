@@ -95,8 +95,8 @@ export class CloudEv {
     info: (session_id: string) =>
       SESSION_INFO(this.HOST, this.API_KEY, session_id),
 
-    start: (connector_id: string) =>
-      SESSION_START(this.HOST, this.API_KEY, connector_id),
+    start: (connector_id: string, stop_kw?: number) =>
+      SESSION_START(this.HOST, this.API_KEY, connector_id, stop_kw),
 
     stop: (session_id: string) =>
       SESSION_STOP(this.HOST, this.API_KEY, session_id)
