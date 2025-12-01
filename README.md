@@ -3,7 +3,7 @@
 A simple and powerful TypeScript/JavaScript SDK for integrating with  
 **CloudHub EV Central System APIs** — charging parks, stations, connectors, sessions, and invoice payments.
 
-> npm package: https://www.npmjs.com/package/cloud-ev  
+> npm package: https://www.npmjs.com/package/cloudhub-ev  
 > API Host: `https://api.cloudhub.mn`  
 > Protocol: REST API (Public)
 
@@ -12,9 +12,9 @@ A simple and powerful TypeScript/JavaScript SDK for integrating with
 ## 📦 Installation
 
 ```bash
-npm install cloud-ev
+npm install cloudhub-ev
 # or
-yarn add cloud-ev
+yarn add cloudhub-ev
 ```
 
 ---
@@ -22,7 +22,7 @@ yarn add cloud-ev
 ## 🚀 Quick Start
 
 ```ts
-import { CloudEv } from "cloud-ev";
+import { CloudEv } from "cloudhub-ev";
 
 const cloud = new CloudEv({
   HOST: "https://api.cloudhub.mn",
@@ -136,7 +136,7 @@ await cloud.invoice.pay({
 # 🧩 Full Example
 
 ```ts
-import { CloudEv } from "cloud-ev";
+import { CloudEv } from "cloudhub-ev";
 
 const cloud = new CloudEv({
   HOST: "https://api.cloudhub.mn",
@@ -227,8 +227,8 @@ x-api-key: YOUR_API_KEY
 # 📮 Support
 
 If you need help integrating CloudHub EV APIs:  
-**Email:** engineering@cloudhub.mn  
-**Github:** coming soon…
+**Email:** buyantogtokh.a@cloudhub.mn  
+**Github:** https://github.com/togtokh-dev/cloud-ev
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "name": "cloud-ev",
+  "name": "cloudhub-ev",
   "version": "0.0.1",
   "description": "CloudHub EV charging API SDK — park info, connector lookup, session start/stop, invoice payments.",
   "main": "dist/index.js",
