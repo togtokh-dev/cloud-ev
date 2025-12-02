@@ -83,7 +83,7 @@ export type ConnectorT = {
 
 // Park + түүний Station-ууд + Station бүрийн Connector-ууд
 export type ParkType = ParkT & {
-  stations: (StationT & {
+  stations: (StationT[] & {
     connectors: ConnectorT[];
   })[];
 };
