@@ -11,7 +11,7 @@ export const INVOICE_PAY = async (
     paid_amount: number;
     tra_id: string;
   }
-): Promise<{ success: boolean; message: string; data?: any }> => {
+): Promise<{ success: boolean; message: string; data?: { id: string } }> => {
   try {
     const res = await axiosMasterLogger(
       {

@@ -1,6 +1,7 @@
 // src/session.ts
 import { axiosMasterLogger } from "axios-master";
 import { parseErr } from ".";
+import { SessionInfoType } from "./types";
 
 /**
  * GET /ev-central-system/v1/public/session/info/:session_id
@@ -12,7 +13,7 @@ export const SESSION_INFO = async (
   HOST: string,
   API_KEY: string,
   session_id: string
-): Promise<{ success: boolean; message: string; data?: any }> => {
+): Promise<{ success: boolean; message: string; data?: SessionInfoType }> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -51,7 +52,7 @@ export const SESSION_START = async (
     stop_kw?: number;
     id_tag?: string;
   }
-): Promise<{ success: boolean; message: string; data?: any }> => {
+): Promise<{ success: boolean; message: string; data?: SessionInfoType }> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -88,7 +89,7 @@ export const SESSION_STOP = async (
   HOST: string,
   API_KEY: string,
   session_id: string
-): Promise<{ success: boolean; message: string; data?: any }> => {
+): Promise<{ success: boolean; message: string; data?: SessionInfoType }> => {
   try {
     const res = await axiosMasterLogger(
       {

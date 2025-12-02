@@ -88,3 +88,76 @@ export type StationWithConnectors = StationT & {
 export type ParkType = ParkT & {
   stations: StationWithConnectors[];
 };
+export type SessionInfoType = {
+  id: string;
+  tag_id: string | null;
+  txn_id: number | null;
+  park: {
+    id: string;
+    name: string;
+    station: {
+      id: string;
+      name: string;
+      connector: {
+        id: string;
+        number: number;
+      };
+    };
+  };
+  status:
+    | "created" // invoice үүссэн
+    | "running" // цэнэглэж байна
+    | "stopping" // цэнэглэлт зогсож байна
+    | "stopped" // цэнэглэлт зогссон
+    | "invoiced" // төлбөрийн нэхэмжилэл үүссэн
+    | "paid" // төлбөн
+    | "failed" // алдаа гарсан
+    | "done"; // дууссан
+  invoice: {
+    invoice_id: string;
+    method: string;
+    amount: number;
+  } | null;
+  started_at: string | null;
+  stopped_at: string | null;
+  total_kwh: number | null;
+  total_minutes: number | null;
+  total_amount: number | null;
+  info: {
+    meter_start: number | null;
+    meter_stop: number | null;
+    energy_wh: number | null;
+    last_meter_ts: string | null;
+    last_import_wh: number | null;
+    last_export_wh: number | null;
+    last_import_interval_wh: number | null;
+    last_export_interval_wh: number | null;
+    last_power_w: number | null;
+    last_power_offered_w: number | null;
+    last_current_a: number | null;
+    last_current_offered_a: number | null;
+    last_voltage_v: number | null;
+    last_frequency_hz: number | null;
+    last_power_factor: number | null;
+    phase: {
+      v_l1n: number | null;
+      v_l2n: number | null;
+      v_l3n: number | null;
+      i_l1: number | null;
+      i_l2: number | null;
+      i_l3: number | null;
+    };
+    last_soc_pct: number | null;
+    last_temp_c: number | null;
+    sample_counts: {
+      total: number;
+      clock: number;
+      periodic: number;
+      trigger: number;
+      txn_begin: number;
+      txn_end: number;
+      interruption_begin: number;
+      interruption_end: number;
+    };
+  };
+};
