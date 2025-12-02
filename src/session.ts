@@ -37,9 +37,9 @@ export const SESSION_INFO = async (
 };
 
 /**
- * POST /ev-central-system/v1/public/sessions/start
+ * POST /ev-central-system/v1/public/session/start
  *
- * curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/sessions/start' \
+ * curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/session/start' \
  * --header 'x-api-key: ...' \
  * --header 'Content-Type: application/json' \
  * --data '{ "connector_id": "8daa0f30-97d4-4ac3-85e3-0a65915d3828" }'
@@ -57,7 +57,7 @@ export const SESSION_START = async (
     const res = await axiosMasterLogger(
       {
         method: "POST",
-        url: `${HOST}/ev-central-system/v1/public/sessions/start`,
+        url: `${HOST}/ev-central-system/v1/public/session/start`,
         headers: {
           "x-api-key": API_KEY,
           "Content-Type": "application/json"
@@ -78,9 +78,9 @@ export const SESSION_START = async (
 };
 
 /**
- * POST /ev-central-system/v1/public/sessions/stop
+ * POST /ev-central-system/v1/public/session/stop
  *
- * curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/sessions/stop' \
+ * curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/session/stop' \
  * --header 'x-api-key: ...' \
  * --header 'Content-Type: application/json' \
  * --data '{ "session_id": "SESS-20251017-0001" }'
@@ -94,7 +94,7 @@ export const SESSION_STOP = async (
     const res = await axiosMasterLogger(
       {
         method: "POST",
-        url: `${HOST}/ev-central-system/v1/public/sessions/stop`,
+        url: `${HOST}/ev-central-system/v1/public/session/stop`,
         headers: {
           "x-api-key": API_KEY,
           "Content-Type": "application/json"
