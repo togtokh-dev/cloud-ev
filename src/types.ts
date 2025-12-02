@@ -81,9 +81,10 @@ export type ConnectorT = {
 
 // ------------ Nested type ------------
 
-// Park + түүний Station-ууд + Station бүрийн Connector-ууд
+export type StationWithConnectors = StationT & {
+  connectors: ConnectorT[];
+};
+
 export type ParkType = ParkT & {
-  stations: (StationT[] & {
-    connectors: ConnectorT[];
-  })[];
+  stations: StationWithConnectors[];
 };

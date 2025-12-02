@@ -14,6 +14,7 @@ async function StartTest() {
   console.log("====== 🏢 PARK DETAIL ======");
   const park = await cloud.info.park("29996bca-17bf-4694-b1d9-91a9ae5751ab");
   console.log(park);
+  park.data?.stations[0].connectors[0];
 
   console.log("====== 🔌 CONNECTOR BY QR ======");
   const connector = await cloud.info.connectorByQR("110A43120069=1");
