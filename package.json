@@ -1,6 +1,6 @@
 {
   "name": "cloudhub-ev",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "CloudHub EV charging API SDK — park info, connector lookup, session start/stop, invoice payments.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,8 +18,8 @@
     "url": "git+https://github.com/togtokh-dev/cloud-ev.git"
   },
   "keywords": [
-    "qpay",
-    "axios",
+    "cloudh ev",
+    "cloudhub",
     "togtokh.dev"
   ],
   "author": "TOGTOKH.DEV",

@@ -1,10 +1,11 @@
 // src/invoice.ts
 import { axiosMasterLogger } from "axios-master";
-import { parseErr } from ".";
+import { logAxios, parseErr } from ".";
 
 export const INVOICE_PAY = async (
   HOST: string,
   API_KEY: string,
+  LOGGER = false,
   params: {
     session_id: string;
     invoice_id: string;
@@ -23,7 +24,11 @@ export const INVOICE_PAY = async (
         },
         data: params
       },
-      { name: "INVOICE PAY", timeout: 20000 }
+      {
+        name: "INVOICE PAY",
+        timeout: 20000,
+        logger: logAxios(LOGGER, "INVOICE PAY")
+      }
     );
 
     if (res?.success) {

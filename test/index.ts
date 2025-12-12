@@ -29,14 +29,15 @@ async function StartTest() {
   console.log(price);
 
   console.log("====== ▶️ SESSION START ======");
-  const start = await cloud.session.start(
-    "8daa0f30-97d4-4ac3-85e3-0a65915d3828"
-  );
+  const start = await cloud.session.start({
+    connector_id: "8daa0f30-97d4-4ac3-85e3-0a65915d3828"
+    // stop_kw?: number;
+    // id_tag?: string;
+  });
   console.log(start);
 
   // If start is OK, use returned session_id
-  const sessionId =
-    start?.data?.session_id || "9f7c7504-4c0f-4098-a33e-ba1b3b7bf25c";
+  const sessionId = start?.data?.id || "9f7c7504-4c0f-4098-a33e-ba1b3b7bf25c";
 
   console.log("====== ℹ️ SESSION INFO ======");
   const sessionInfo = await cloud.session.info(sessionId);

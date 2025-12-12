@@ -1,13 +1,14 @@
 // src/info.ts
-import { axiosMasterLogger, AxiosMasterError } from "axios-master";
+import { axiosMasterLogger } from "axios-master";
 import type { ConnectorT, ParkT, ParkType, StationT } from "./types";
-import { parseErr } from ".";
+import { logAxios, parseErr } from ".";
 
 /* ----------------------------- /parks ----------------------------- */
-// curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/parks'
+// GET /parks
 export const PARK_LIST = async (
   HOST: string,
-  API_KEY: string
+  API_KEY: string,
+  LOGGER = false
 ): Promise<{ success: boolean; message: string; data?: ParkType[] }> => {
   try {
     const res = await axiosMasterLogger(
@@ -18,7 +19,11 @@ export const PARK_LIST = async (
           "x-api-key": API_KEY
         }
       },
-      { name: "PARK LIST", timeout: 20000 }
+      {
+        name: "PARK LIST",
+        timeout: 20000,
+        logger: logAxios(LOGGER, "PARK LIST")
+      }
     );
 
     if (res?.success && Array.isArray(res.data)) {
@@ -32,10 +37,11 @@ export const PARK_LIST = async (
 };
 
 /* ----------------------------- /park (list only) ----------------------------- */
-// curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/park'
+// GET /park
 export const PARK_INFO_LIST = async (
   HOST: string,
-  API_KEY: string
+  API_KEY: string,
+  LOGGER = false
 ): Promise<{ success: boolean; message: string; data?: ParkT[] }> => {
   try {
     const res = await axiosMasterLogger(
@@ -46,7 +52,11 @@ export const PARK_INFO_LIST = async (
           "x-api-key": API_KEY
         }
       },
-      { name: "PARK INFO LIST", timeout: 20000 }
+      {
+        name: "PARK INFO LIST",
+        timeout: 20000,
+        logger: logAxios(LOGGER, "PARK INFO LIST")
+      }
     );
 
     if (res?.success && Array.isArray(res.data)) {
@@ -60,10 +70,11 @@ export const PARK_INFO_LIST = async (
 };
 
 /* ----------------------------- /park/:id ----------------------------- */
-// curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/park/{park_id}'
+// GET /park/:id
 export const PARK_INFO = async (
   HOST: string,
   API_KEY: string,
+  LOGGER = false,
   park_id: string
 ): Promise<{ success: boolean; message: string; data?: ParkType }> => {
   try {
@@ -75,7 +86,11 @@ export const PARK_INFO = async (
           "x-api-key": API_KEY
         }
       },
-      { name: "PARK INFO", timeout: 20000 }
+      {
+        name: "PARK INFO",
+        timeout: 20000,
+        logger: logAxios(LOGGER, "PARK INFO")
+      }
     );
 
     if (res?.success) {
@@ -89,11 +104,11 @@ export const PARK_INFO = async (
 };
 
 /* ----------------------------- /connector ----------------------------- */
-// curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/connector'
-// --data '{ "qr_value":"110A43120069=1" }'
+// POST /connector
 export const CONNECTOR_BY_QR = async (
   HOST: string,
   API_KEY: string,
+  LOGGER = false,
   qr_value: string
 ): Promise<{
   success: boolean;
@@ -115,7 +130,11 @@ export const CONNECTOR_BY_QR = async (
         },
         data: { qr_value }
       },
-      { name: "CONNECTOR BY QR", timeout: 20000 }
+      {
+        name: "CONNECTOR BY QR",
+        timeout: 20000,
+        logger: logAxios(LOGGER, "CONNECTOR BY QR")
+      }
     );
 
     if (res?.success) {
@@ -129,11 +148,11 @@ export const CONNECTOR_BY_QR = async (
 };
 
 /* ----------------------------- /price ----------------------------- */
-// curl --location 'https://api.cloudhub.mn/ev-central-system/v1/public/price'
-// --data '{ "amount":0, "kWh":16.3, "connector_id":"..." }'
+// POST /price
 export const PRICE = async (
   HOST: string,
   API_KEY: string,
+  LOGGER = false,
   params: { amount: number; kWh: number; connector_id: string }
 ): Promise<{
   success: boolean;
@@ -155,7 +174,11 @@ export const PRICE = async (
         },
         data: params
       },
-      { name: "PRICE", timeout: 20000 }
+      {
+        name: "PRICE",
+        timeout: 20000,
+        logger: logAxios(LOGGER, "PRICE")
+      }
     );
 
     if (res?.success) {
@@ -168,6 +191,7 @@ export const PRICE = async (
   }
 };
 
+/* ----------------------------- EXPORT ----------------------------- */
 export default {
   PARK_LIST,
   PARK_INFO_LIST,
