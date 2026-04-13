@@ -124,6 +124,8 @@ export class CloudEv {
       connector_id: string;
       stop_kw?: number;
       id_tag?: string;
+      note?: string;
+      is_white_list?: boolean;
     }) => SESSION_START(this.HOST, this.API_KEY, this.LOGGER, params),
 
     stop: (session_id: string) =>
