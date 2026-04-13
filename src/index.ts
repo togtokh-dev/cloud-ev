@@ -64,7 +64,7 @@ export class CloudEv {
     this.HOST = config.HOST;
     this.API_KEY = config.API_KEY;
     this.MERCHANT_ID = config.MERCHANT_ID;
-    this.LOGGER = config.LOGGER;
+    this.LOGGER = config.LOGGER || false;
   }
 
   /* -------------------------------- INFO APIs -------------------------------- */

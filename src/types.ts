@@ -34,6 +34,7 @@ export type ParkT = {
   contact_phonenumber: string;
   geo_lat: number;
   geo_lng: number;
+  white_list: string[];
   active: boolean;
 };
 
@@ -76,7 +77,9 @@ export type ConnectorT = {
   last_status_at: string; // ISO datetime
   meta: any;
   qr_value: string;
+  qr_fixed_value: string;
   active: boolean;
+  is_test: boolean;
 };
 
 // ------------ Nested type ------------
