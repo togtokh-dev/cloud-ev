@@ -1,6 +1,7 @@
 // src/invoice.ts
 import { axiosMasterLogger } from "axios-master";
-import { logAxios, parseErr } from ".";
+import { logAxios, parseErr, parseErrCode } from ".";
+import type { CloudEvResult } from "./types";
 
 export const INVOICE_PAY = async (
   HOST: string,
@@ -12,7 +13,7 @@ export const INVOICE_PAY = async (
     paid_amount: number;
     tra_id: string;
   }
-): Promise<{ success: boolean; message: string; data?: { id: string } }> => {
+): Promise<CloudEvResult<{ id: string }>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -35,16 +36,18 @@ export const INVOICE_PAY = async (
       return {
         success: true,
         message: res.message,
+        code: res.code,
         data: res.data
       };
     }
 
     return {
       success: false,
-      message: res?.message || "failed"
+      message: res?.message || "failed",
+      code: res?.code
     };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 

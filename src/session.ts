@@ -1,7 +1,7 @@
 // src/session.ts
 import { axiosMasterLogger } from "axios-master";
-import { logAxios, parseErr } from ".";
-import { SessionInfoType } from "./types";
+import { logAxios, parseErr, parseErrCode } from ".";
+import type { CloudEvResult, SessionInfoType, SessionStartParams } from "./types";
 
 /* ----------------------------- /session/info ----------------------------- */
 /**
@@ -12,7 +12,7 @@ export const SESSION_INFO = async (
   API_KEY: string,
   LOGGER = false,
   session_id: string
-): Promise<{ success: boolean; message: string; data?: SessionInfoType }> => {
+): Promise<CloudEvResult<SessionInfoType>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -30,29 +30,28 @@ export const SESSION_INFO = async (
     );
 
     if (res?.success) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed" };
+    return { success: false, message: res?.message || "failed", code: res?.code };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 
 /* ----------------------------- /session/start ----------------------------- */
 /**
  * POST /ev-central-system/v1/public/session/start
+ *
+ * Алдаа гарвал `code`-оор ялгана (SessionStartErrorCode), жишээ нь:
+ *   CAR_NOT_ALLOWED → "Уучлаарай, энэ зогсоол дээр таны машиныг цэнэглэх боломжгүй байна."
  */
 export const SESSION_START = async (
   HOST: string,
   API_KEY: string,
   LOGGER = false,
-  params: {
-    connector_id: string;
-    stop_kw?: number;
-    id_tag?: string;
-  }
-): Promise<{ success: boolean; message: string; data?: SessionInfoType }> => {
+  params: SessionStartParams
+): Promise<CloudEvResult<SessionInfoType>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -72,12 +71,12 @@ export const SESSION_START = async (
     );
 
     if (res?.success) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed" };
+    return { success: false, message: res?.message || "failed", code: res?.code };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 
@@ -89,8 +88,9 @@ export const SESSION_STOP = async (
   HOST: string,
   API_KEY: string,
   LOGGER = false,
-  session_id: string
-): Promise<{ success: boolean; message: string; data?: SessionInfoType }> => {
+  session_id: string,
+  reason?: string
+): Promise<CloudEvResult<SessionInfoType>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -100,7 +100,7 @@ export const SESSION_STOP = async (
           "x-api-key": API_KEY,
           "Content-Type": "application/json"
         },
-        data: { session_id }
+        data: { session_id, ...(reason ? { reason } : {}) }
       },
       {
         name: "SESSION STOP",
@@ -110,12 +110,12 @@ export const SESSION_STOP = async (
     );
 
     if (res?.success) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed" };
+    return { success: false, message: res?.message || "failed", code: res?.code };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 

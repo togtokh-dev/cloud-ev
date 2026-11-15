@@ -10,30 +10,33 @@ async function StartTest() {
   console.log("====== 🌍 INFO LIST ======");
   const parks = await cloud.info.list();
   console.log(parks);
+  // Хушуу бүр tariff_id / price_now, зогсоол бүр tariffs
+  const c0 = parks.data?.[0]?.stations?.[0]?.connectors?.[0];
+  console.log(c0?.tariff_id, c0?.price_now, parks.data?.[0]?.tariffs);
 
   console.log("====== 🏢 PARK DETAIL ======");
   const park = await cloud.info.park("29996bca-17bf-4694-b1d9-91a9ae5751ab");
   console.log(park);
-  park.data?.stations[0].connectors[0];
 
   console.log("====== 🔌 CONNECTOR BY QR ======");
   const connector = await cloud.info.connectorByQR("110A43120069=1");
-  console.log(connector);
+  console.log(connector, connector.data?.tariff);
 
   console.log("====== ⚡ PRICE CALCULATE ======");
   const price = await cloud.info.price({
-    amount: 0,
-    kWh: 16.3,
-    connector_id: "8daa0f30-97d4-4ac3-85e3-0a65915d3828"
+    connector_id: "8daa0f30-97d4-4ac3-85e3-0a65915d3828",
+    amount: 20000 // эсвэл kWh: 16.3
   });
+  // data.amount — тооцоолсон дүн, data.max_amount — hold хийх дүн, data.breakdown — цагийн задаргаа
   console.log(price);
 
   console.log("====== ▶️ SESSION START ======");
   const start = await cloud.session.start({
-    connector_id: "8daa0f30-97d4-4ac3-85e3-0a65915d3828"
-    // stop_kw?: number;
-    // id_tag?: string;
+    connector_id: "8daa0f30-97d4-4ac3-85e3-0a65915d3828",
+    stop_price: 20000, // урьдчилж төлсөн дүн — эцсийн дүн яг үүнийг болно
+    info: { plate_number: "1234УБА", phone: "99112233" }
   });
+  if (!start.success && start.code === "CAR_NOT_ALLOWED") console.log("Энэ зогсоолд машин зөвшөөрөгдөөгүй:", start.message);
   console.log(start);
 
   // If start is OK, use returned session_id
@@ -41,7 +44,7 @@ async function StartTest() {
 
   console.log("====== ℹ️ SESSION INFO ======");
   const sessionInfo = await cloud.session.info(sessionId);
-  console.log(sessionInfo);
+  console.log(sessionInfo, sessionInfo.data?.price_breakdown);
 
   console.log("====== ⏹️ SESSION STOP ======");
   const stop = await cloud.session.stop(sessionId);

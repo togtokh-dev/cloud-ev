@@ -56,12 +56,13 @@ cloud.info
   .catch((err) => console.error(err));
 ```
 
-Every method returns a promise that resolves to a uniform envelope:
+Every method returns a promise that resolves to a uniform envelope (`CloudEvResult<T>`):
 
 ```ts
 {
   success: boolean;
   message: string;
+  code?: string; // server code, e.g. "CAR_NOT_ALLOWED" — use it to branch on errors
   data?: <method-specific payload>;
 }
 ```
@@ -109,14 +110,27 @@ await cloud.info.park("PARK_ID");
 await cloud.info.connectorByQR("110A43120069=1");
 // data: { park, station, connector }
 
-// POST /price — estimate charging price
+// POST /price — estimate charging price (time-of-use tariff aware)
 await cloud.info.price({
-  amount: 0,
-  kWh: 16.3,
-  connector_id: "CONNECTOR_ID"
+  connector_id: "CONNECTOR_ID",
+  kWh: 16.3,          // either kWh …
+  // amount: 20000,   // … or amount (₮)
+  // power_kw: 60,    // optional — default: connector power_kw
+  // start_at: "2026-11-15T21:30:00+08:00" // optional — default: now
 });
-// data: { amount, kwh, time }
+// data: { amount, kwh, time, max_amount, breakdown, tariff, price_now, price_min, price_max, … }
 ```
+
+#### Tariffs (time-of-use pricing)
+
+Charging is billed by the connector's **tariff** — a list of daily periods, each with its own price per kWh
+(Mongolia time, UTC+8). A session that crosses a period boundary is split at that boundary and each part is
+billed at its own price.
+
+- `connector.tariff_id`, `connector.price_now` — the tariff that applies and its current price.
+- `connector.kw_price` — a general **display** price only; it is not used for billing.
+- `park.tariffs` (from `list()` / `park()`) and `connectorByQR(...).data.tariff` — full tariff definitions.
+- `price().data.max_amount` — the amount to hold when pre-authorising a `kWh`-based charge (kWh × highest tariff price).
 
 ### `cloud.session`
 
@@ -124,20 +138,45 @@ await cloud.info.price({
 // POST /session/start — start a charging session
 const start = await cloud.session.start({
   connector_id: "CONNECTOR_ID",
-  stop_kw: 20,          // optional
+  stop_price: 20000,    // optional — stop at this amount (₮); recommended for prepaid flows
+  // stop_kw: 20,       // optional — stop at this energy (kWh); not together with stop_price
   id_tag: "ID_TAG",     // optional
   note: "optional note",// optional
-  is_white_list: false  // optional
+  is_white_list: false, // optional
+  info: {               // optional — required plate_number on fixed-car parks
+    plate_number: "1234УБА",
+    user_id: "U123",
+    phone: "99112233",
+    email: "user@example.com"
+  }
 });
+if (!start.success) console.log(start.code, start.message); // e.g. "CAR_NOT_ALLOWED"
 
-// GET /session/info/:id — session status + live meter info
-await cloud.session.info("SESSION_ID");
+// GET /session/info/:id — status, live meter info and price breakdown
+const info = await cloud.session.info("SESSION_ID");
+info.data?.price_breakdown; // [{ from, to, period, kw_price, kwh, amount }]
 
 // POST /session/stop — stop a running session
 await cloud.session.stop("SESSION_ID");
 ```
 
-`session.start`, `session.info`, and `session.stop` resolve with `data` typed as the session info object (id, park/station/connector, status, invoice, meter readings, etc.).
+`session.start`, `session.info`, and `session.stop` resolve with `data` typed as the session info object (id, park/station/connector, status, invoice, meter readings, tariff, price breakdown, etc.).
+
+**Billing with limits.** When a session auto-stops at its limit, the final bill equals the limit exactly:
+`stop_price` → `total_amount === stop_price`; `stop_kw` → `total_kwh === stop_kw`. The real measured values are in
+`price_adjusted`. If charging ends before the limit (car full, user stopped), the real amount is billed — refund the
+difference to the user.
+
+**`session.start` error codes** (`result.code` when `success === false`; `message` can be shown to the user):
+
+| code | meaning |
+| --- | --- |
+| `PLATE_REQUIRED` | Fixed-car park — `info.plate_number` is required |
+| `VEHICLE_NOT_FOUND` | No vehicle found for the plate number |
+| `CAR_NOT_ALLOWED` | The car's make is not allowed at this park |
+| `VEHICLE_CHECK_UNAVAILABLE` | Vehicle lookup service is temporarily unavailable |
+| `PRICE_NOT_SET` | No tariff price — `stop_price` can't be used |
+| `400` / `404` / `409` | Invalid input, not plugged / not found / charger offline or busy |
 
 ### `cloud.invoice`
 
@@ -204,9 +243,10 @@ The package root exports:
 - `CloudEv` — main client class (also the default export)
 - `CloudEvConfig` — config interface
 - `parseErr(error)` — helper that extracts a message from an error/axios error
+- `parseErrCode(error)` — helper that extracts the server `code` (or HTTP status)
 - `logAxios(enabled, name)` — logger factory used internally
-
-Method parameters and `data` payloads are fully typed, so editors give autocomplete on results. (The underlying type aliases such as `ParkType` and `ConnectorT` live in `src/types.ts` and are used in the method signatures, but are not re-exported from the package root.)
+- All types from `src/types.ts` — e.g. `CloudEvResult`, `ParkType`, `ConnectorT`, `TariffT`, `PriceParams`,
+  `PriceResultT`, `PriceBreakdownRowT`, `SessionStartParams`, `SessionInfoType`, `SessionStartErrorCode`
 
 ---
 

@@ -1,15 +1,11 @@
 // src/info.ts
 import { axiosMasterLogger } from "axios-master";
-import type { ConnectorT, ParkT, ParkType, StationT } from "./types";
-import { logAxios, parseErr } from ".";
+import type { CloudEvResult, ConnectorT, ParkT, ParkType, PriceParams, PriceResultT, StationT, TariffT } from "./types";
+import { logAxios, parseErr, parseErrCode } from ".";
 
 /* ----------------------------- /parks ----------------------------- */
-// GET /parks
-export const PARK_LIST = async (
-  HOST: string,
-  API_KEY: string,
-  LOGGER = false
-): Promise<{ success: boolean; message: string; data?: ParkType[] }> => {
+// GET /parks — зогсоол → станц → хушуу (+ tariffs)
+export const PARK_LIST = async (HOST: string, API_KEY: string, LOGGER = false): Promise<CloudEvResult<ParkType[]>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -27,22 +23,18 @@ export const PARK_LIST = async (
     );
 
     if (res?.success && Array.isArray(res.data)) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed", data: [] };
+    return { success: false, message: res?.message || "failed", code: res?.code, data: [] };
   } catch (error) {
-    return { success: false, message: parseErr(error), data: [] };
+    return { success: false, message: parseErr(error), code: parseErrCode(error), data: [] };
   }
 };
 
-/* ----------------------------- /park (list only) ----------------------------- */
-// GET /park
-export const PARK_INFO_LIST = async (
-  HOST: string,
-  API_KEY: string,
-  LOGGER = false
-): Promise<{ success: boolean; message: string; data?: ParkT[] }> => {
+/* ----------------------------- /park ----------------------------- */
+// GET /park — зогсоолууд (станц / хушуугүй)
+export const PARK_INFO_LIST = async (HOST: string, API_KEY: string, LOGGER = false): Promise<CloudEvResult<ParkT[]>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -60,23 +52,18 @@ export const PARK_INFO_LIST = async (
     );
 
     if (res?.success && Array.isArray(res.data)) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed", data: [] };
+    return { success: false, message: res?.message || "failed", code: res?.code, data: [] };
   } catch (error) {
-    return { success: false, message: parseErr(error), data: [] };
+    return { success: false, message: parseErr(error), code: parseErrCode(error), data: [] };
   }
 };
 
 /* ----------------------------- /park/:id ----------------------------- */
-// GET /park/:id
-export const PARK_INFO = async (
-  HOST: string,
-  API_KEY: string,
-  LOGGER = false,
-  park_id: string
-): Promise<{ success: boolean; message: string; data?: ParkType }> => {
+// GET /park/:id — зогсоол → станц → хушуу (+ tariffs)
+export const PARK_INFO = async (HOST: string, API_KEY: string, LOGGER = false, park_id: string): Promise<CloudEvResult<ParkType>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -94,31 +81,31 @@ export const PARK_INFO = async (
     );
 
     if (res?.success) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed" };
+    return { success: false, message: res?.message || "failed", code: res?.code };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 
 /* ----------------------------- /connector ----------------------------- */
-// POST /connector
+// POST /connector — QR-аас хушуу (+ тариф)
 export const CONNECTOR_BY_QR = async (
   HOST: string,
   API_KEY: string,
   LOGGER = false,
   qr_value: string
-): Promise<{
-  success: boolean;
-  message: string;
-  data?: {
+): Promise<
+  CloudEvResult<{
     park: ParkT;
     station: StationT;
     connector: ConnectorT;
-  };
-}> => {
+    /** Хушуунд үйлчлэх тариф */
+    tariff: TariffT | null;
+  }>
+> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -138,31 +125,18 @@ export const CONNECTOR_BY_QR = async (
     );
 
     if (res?.success) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed" };
+    return { success: false, message: res?.message || "failed", code: res?.code };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 
 /* ----------------------------- /price ----------------------------- */
-// POST /price
-export const PRICE = async (
-  HOST: string,
-  API_KEY: string,
-  LOGGER = false,
-  params: { amount: number; kWh: number; connector_id: string }
-): Promise<{
-  success: boolean;
-  message: string;
-  data?: {
-    amount: number;
-    kwh: number;
-    time: number;
-  };
-}> => {
+// POST /price — урьдчилсан үнэ (цагийн тарифын хилийг тооцсон)
+export const PRICE = async (HOST: string, API_KEY: string, LOGGER = false, params: PriceParams): Promise<CloudEvResult<PriceResultT>> => {
   try {
     const res = await axiosMasterLogger(
       {
@@ -182,12 +156,12 @@ export const PRICE = async (
     );
 
     if (res?.success) {
-      return { success: true, message: res.message, data: res.data };
+      return { success: true, message: res.message, code: res.code, data: res.data };
     }
 
-    return { success: false, message: res?.message || "failed" };
+    return { success: false, message: res?.message || "failed", code: res?.code };
   } catch (error) {
-    return { success: false, message: parseErr(error) };
+    return { success: false, message: parseErr(error), code: parseErrCode(error) };
   }
 };
 
